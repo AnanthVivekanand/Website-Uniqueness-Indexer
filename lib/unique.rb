@@ -1,0 +1,6 @@
+require './indexer/comparer.rb'
+require './indexer/crawler.rb'
+
+module Unique
+
+end

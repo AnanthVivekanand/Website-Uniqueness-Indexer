@@ -1,0 +1,45 @@
+require 'rubygems'
+require 'mechanize'
+#require_relative '../website-handler/website.rb'
+require 'open-uri'
+require 'concurrent'
+
+module Unique
+  class LinkScaper
+    include Concurrent::Async
+
+    def initialize
+      @a = Mechanize.new { |agent|
+        agent.user_agent_alias = 'Mac Safari'
+      }
+      
+      @current_url = 'https://en.wikipedia.org/wiki/Cleopatra'
+      @links_found = []
+    end
+
+    def scrape_urls (num)
+      while (@links_found.size < num)
+        #break if @links_found.size > num
+        @a.get(@current_url) do |page|
+          #puts "Got page!"
+          page.links.each do |link|
+            #puts "Got link!"
+            return @links_found if @links_found.size < num
+            unless @links_found.include? (link.resolved_uri)
+              @links_found << link.resolved_uri
+             # puts link.resolved_uri
+             # puts "Link added!"
+             # puts @links_found.size
+            end
+          end
+          
+          #@current_url = @links_found[20]
+          #puts @current_url
+          #puts @links_found.size
+          @links_found.shift
+        end
+      end
+      @links_found
+    end
+  end
+end
